@@ -3,11 +3,13 @@
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
+import slugify from 'slugify'
 
 export default function WritePage() {
     const { data: session, status } = useSession()
     const router = useRouter()
     const [title, setTitle] = useState('')
+    const [slug, setSlug] = useState('')
     const [content, setContent] = useState('')
 
     useEffect(() => {
@@ -17,13 +19,19 @@ export default function WritePage() {
         }
     }, [session, status, router])
 
+    useEffect(() => {
+        setSlug(slugify(title, { lower: true }))
+    }, [title])
+
     const handleSubmit = async () => {
+        const finalSlug = slug || slugify(title, { lower: true })
+
         await fetch('/api/posts', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ title, content }),
+            body: JSON.stringify({ title, content, slug: finalSlug }),
         })
-        router.push('/')
+        router.replace('/')
     }
 
     return (
