@@ -57,6 +57,8 @@ export default function WritePage() {
             body: JSON.stringify({ title, content, slug: finalSlug, categoryId }),
         })
 
+        router.push('/admin')
+
         setTitle('')
         setContent('')
         setCategoryId('')

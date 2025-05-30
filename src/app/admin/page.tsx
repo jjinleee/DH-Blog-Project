@@ -10,6 +10,8 @@ export default function AdminPage() {
     const router = useRouter();
 
     const [posts, setPosts] = useState([]);
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [deleteTarget, setDeleteTarget] = useState<number | null>(null);
 
     useEffect(() => {
         if (status === 'loading') return; // 아직 세션 확인 중
@@ -64,15 +66,9 @@ export default function AdminPage() {
                         수정
                       </button>
                       <button
-                        onClick={async () => {
-                          const confirmed = window.confirm('정말 삭제하시겠습니까?');
-                          if (!confirmed) return;
-                          await fetch('/api/posts', {
-                            method: 'DELETE',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ id: post.id }),
-                          });
-                          setPosts(posts.filter((p: any) => p.id !== post.id));
+                        onClick={() => {
+                          setDeleteTarget(post.id);
+                          setShowDeleteModal(true);
                         }}
                         className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded"
                       >
@@ -83,6 +79,38 @@ export default function AdminPage() {
                 ))}
               </ul>
             </div>
+            {showDeleteModal && (
+              <div className="fixed inset-0 bg-black/20 flex items-center justify-center z-50">
+                <div className="bg-white rounded-lg shadow-lg p-6 w-96">
+                  <h3 className="text-lg font-semibold mb-4">게시글 삭제</h3>
+                  <p>정말 삭제하시겠습니까?</p>
+                  <div className="mt-6 flex justify-end space-x-2">
+                    <button
+                      className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
+                      onClick={() => setShowDeleteModal(false)}
+                    >
+                      취소
+                    </button>
+                    <button
+                      className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
+                      onClick={async () => {
+                        if (deleteTarget === null) return;
+                        await fetch('/api/posts', {
+                          method: 'DELETE',
+                          headers: { 'Content-Type': 'application/json' },
+                          body: JSON.stringify({ id: deleteTarget }),
+                        });
+                        setPosts(posts.filter((p: any) => p.id !== deleteTarget));
+                        setShowDeleteModal(false);
+                        setDeleteTarget(null);
+                      }}
+                    >
+                      삭제
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
         </div>
     );
 }
