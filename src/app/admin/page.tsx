@@ -10,6 +10,7 @@ export default function AdminPage() {
     const router = useRouter();
 
     const [posts, setPosts] = useState([]);
+    const [categories, setCategories] = useState([]);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [deleteTarget, setDeleteTarget] = useState<number | null>(null);
 
@@ -25,6 +26,9 @@ export default function AdminPage() {
             fetch('/api/posts')
                 .then(res => res.json())
                 .then(data => setPosts(data));
+            fetch('/api/categories')
+                .then(res => res.json())
+                .then(data => setCategories(data));
         }
     }, [status, session]);
 
@@ -79,6 +83,7 @@ export default function AdminPage() {
                 ))}
               </ul>
             </div>
+
             {showDeleteModal && (
               <div className="fixed inset-0 bg-black/20 flex items-center justify-center z-50">
                 <div className="bg-white rounded-lg shadow-lg p-6 w-96">
