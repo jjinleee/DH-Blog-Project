@@ -19,7 +19,14 @@ export default function LoginPage() {
         });
 
         if (res?.ok) {
-            router.push('/');
+            const sessionRes = await fetch('/api/auth/session');
+            const session = await sessionRes.json();
+
+            if (session?.user?.role === 'ADMIN') {
+                router.push('/admin');
+            } else {
+                router.push('/');
+            }
         } else {
             alert('로그인 실패');
         }

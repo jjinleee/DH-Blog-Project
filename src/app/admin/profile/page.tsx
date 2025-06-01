@@ -12,6 +12,8 @@ export default function AdminProfilePage() {
   const [currentPassword, setCurrentPassword] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
 
 
   useEffect(() => {
@@ -132,35 +134,73 @@ export default function AdminProfilePage() {
         </button>
       </form>
       <div className="mt-6 space-y-2">
-        <form action="/api/auth/signout" method="post">
-          <button
-            type="submit"
-            className="w-full text-sm text-gray-600 hover:underline"
-          >
-            로그아웃
-          </button>
-        </form>
-        <form
-          onSubmit={async (e) => {
-            e.preventDefault();
-            const confirmed = confirm('정말로 탈퇴하시겠습니까?');
-            if (!confirmed) return;
-            const res = await fetch('/api/user/delete', { method: 'DELETE' });
-            if (res.ok) {
-              window.location.href = '/';
-            } else {
-              alert('탈퇴 실패');
-            }
-          }}
+        <button
+          onClick={() => setShowLogoutModal(true)}
+          className="w-full text-sm text-gray-600 hover:underline"
         >
-          <button
-            type="submit"
-            className="w-full text-sm text-red-600 hover:underline"
-          >
-            탈퇴하기
-          </button>
-        </form>
+          로그아웃
+        </button>
+        <button
+          onClick={() => setShowDeleteModal(true)}
+          className="w-full text-sm text-blue-600 hover:underline"
+        >
+          탈퇴하기
+        </button>
       </div>
+      {showLogoutModal && (
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+          <div className="bg-white p-7 rounded shadow-lg space-y-4 max-w-sm w-full">
+            <h2 className=" font-semibold">로그아웃 하시겠습니까?</h2>
+            <div className="flex justify-end space-x-2">
+              <button
+                onClick={() => setShowLogoutModal(false)}
+                className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
+              >
+                취소
+              </button>
+              <button
+                onClick={() => signOut({ callbackUrl: '/login' })}
+                className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+              >
+                로그아웃
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      {showDeleteModal && (
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+          <div className="bg-white p-7 rounded shadow-lg space-y-4 max-w-sm w-full">
+            <h2 className="font-semibold">정말로 탈퇴하시겠습니까?</h2>
+            <div className="flex justify-end space-x-2">
+              <button
+                onClick={() => setShowDeleteModal(false)}
+                className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
+              >
+                취소
+              </button>
+              <form
+                onSubmit={async (e) => {
+                  e.preventDefault();
+                  const res = await fetch('/api/user/delete', { method: 'DELETE' });
+                  if (res.ok) {
+                    window.location.href = '/';
+                  } else {
+                    alert('탈퇴 실패');
+                  }
+                }}
+              >
+                <button
+                  type="submit"
+                  className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+                >
+                  탈퇴하기
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

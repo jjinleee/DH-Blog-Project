@@ -21,7 +21,7 @@ export default async function Sidebar() {
                             src={user?.image || "/images/admin-profile.png"}
                             alt={user?.name ? `${user.name}의 프로필 이미지` : "기본 프로필 이미지"}
                             className="w-24 h-24 rounded-full object-cover"
-                        />                        <p className="mt-4 font-bold text-lg">{user?.name ?? '관리자'}</p>
+                        />                        <p className="mt-4 font-bold text-lg">{user?.name ?? '로그인필요'}</p>
                         <p className="text-sm text-gray-600">{user?.email}</p>
                     </div>
 
