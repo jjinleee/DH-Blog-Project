@@ -34,6 +34,7 @@ export const authOptions: NextAuthOptions = {
                     id: user.id.toString(),
                     name: user.name,
                     email: user.email,
+                    image: user.image?.substring(0, 254), // Ensures it's short enough for DB
                     role: user.role,
                 };
             },
@@ -47,7 +48,9 @@ export const authOptions: NextAuthOptions = {
     },
     callbacks: {
         async jwt({ token, user }) {
-            if (user) token.user = user;
+            if (user) {
+                token.user = user;
+            }
             return token;
         },
         async session({ session, token }) {
