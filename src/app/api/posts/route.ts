@@ -64,17 +64,40 @@ export async function PATCH(req: Request) {
         return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const { id, title, content, categoryId } = await req.json()
+    const formData = await req.formData()
+    const id = formData.get('id') as string
+    const title = formData.get('title') as string
+    const content = formData.get('content') as string
+    const categoryId = formData.get('categoryId') as string
 
-    const post = await prisma.post.updateMany({
+    let imageUrl: string | null = null
+    const file = formData.get('image')
+    if (file && file instanceof File) {
+        const bytes = await file.arrayBuffer()
+        const buffer = Buffer.from(bytes)
+        const ext = file.name.split('.').pop()
+        const filename = `${uuidv4()}.${ext}`
+        const filePath = path.join(process.cwd(), 'public', 'uploads', filename)
+        await writeFile(filePath, buffer)
+        imageUrl = `/uploads/${filename}`
+    } else {
+        // fetch existing imageUrl if no new file provided
+        const existing = await prisma.post.findUnique({
+            where: { id: Number(id) },
+            select: { imageUrl: true },
+        })
+        imageUrl = existing?.imageUrl || null
+    }
+
+    const post = await prisma.post.update({
         where: {
             id: Number(id),
-            author: { email: session.user.email }
         },
         data: {
             title,
             content,
-            categoryId: categoryId ? Number(categoryId) : null
+            categoryId: categoryId ? Number(categoryId) : null,
+            imageUrl,
         },
     })
 

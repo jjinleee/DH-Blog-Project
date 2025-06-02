@@ -50,8 +50,8 @@ export default function CategoryPage() {
     if (loading) return <p className="p-6">로딩 중...</p>;
 
     return (
-        <div className="p-6 max-w-4xl mx-auto">
-            <h1 className="text-3xl font-bold mb-4 text-left">{categoryName}</h1>
+        <div className="p-5 max-w-4xl mx-auto">
+            <h1 className="text-3xl px-10 font-bold mb-4 text-left">{categoryName}</h1>
             <div>
                 <ul className="space-y-3 max-w-xl">
                     {posts.map((post) => (

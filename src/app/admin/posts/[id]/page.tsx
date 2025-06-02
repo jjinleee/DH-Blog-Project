@@ -118,17 +118,32 @@ export default function AdminPostDetailPage() {
         formData.append('categoryId', categoryId);
         if (imageFile) {
             formData.append('image', imageFile);
-        } else if (post.imageUrl) {
-            formData.append('imageUrl', post.imageUrl);
         }
 
-        await fetch('/api/posts', {
-            method: 'PATCH',
-            body: formData,
-        });
+        try {
+            const res = await fetch('/api/posts', {
+                method: 'PATCH',
+                body: formData,
+            });
 
-        setEditMode(false);
-        router.refresh();
+            if (!res.ok) {
+                throw new Error('Failed to update post');
+            }
+
+            const updated = await res.json();
+
+            // Ensure the updated image bypasses cache
+            const cacheBypassUrl = updated.imageUrl ? `${updated.imageUrl}?t=${Date.now()}` : null;
+
+            setPost({
+                ...updated,
+                imageUrl: cacheBypassUrl,
+            });
+
+            setEditMode(false);
+        } catch (error) {
+            console.error(error);
+        }
     };
 
     if (status === 'loading') return <p>로딩 중...</p>;

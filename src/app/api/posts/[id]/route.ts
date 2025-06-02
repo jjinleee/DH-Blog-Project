@@ -12,32 +12,42 @@ export const config = {
 };
 
 export async function GET(
-    req: NextRequest,
-    context: { params: { id: string } }  // context로부터 직접 받아야 함
+  req: NextRequest,
+  { params }: { params: { id: string } }
 ) {
-    const { id } = context.params;  // ✅ context에서 params 꺼내기
+  const { id } = params;
 
-    try {
-        const post = await prisma.post.findUnique({
-            where: { id: Number(id) },
-            include: { category: true },
-        });
-        if (!post) return NextResponse.json({ error: 'Not found' }, { status: 404 });
-        return NextResponse.json(post);
-    } catch (err) {
-        return NextResponse.json({ error: 'Failed to fetch post' }, { status: 500 });
-    }
+  try {
+    const post = await prisma.post.findUnique({
+      where: { id: Number(id) },
+      include: { category: true },
+    });
+    if (!post) return NextResponse.json({ error: 'Not found' }, { status: 404 });
+    return NextResponse.json(post);
+  } catch (err) {
+    return NextResponse.json({ error: 'Failed to fetch post' }, { status: 500 });
+  }
 }
 
 export async function PATCH(req: Request) {
-  const form = new IncomingForm({ uploadDir: './public/uploads', keepExtensions: true });
+  // formidable expects a Node.js IncomingMessage, but Next.js passes a web Request.
+  // We need to convert the web Request to a Node.js stream for formidable to work.
+  const form = new IncomingForm({
+    uploadDir: './public/uploads',
+    keepExtensions: true,
+    multiples: false,
+  });
   return new Promise((resolve, reject) => {
+    // @ts-ignore
     form.parse(req as any, async (err, fields, files) => {
       if (err) {
         return resolve(NextResponse.json({ error: 'Form parse error' }, { status: 400 }));
       }
 
-      const { id, title, content, categoryId } = fields;
+      const id = fields.id;
+      const title = fields.title;
+      const content = fields.content;
+      const categoryId = fields.categoryId;
       let imageUrl: string | undefined = undefined;
 
       const file = files.image;
@@ -46,6 +56,7 @@ export async function PATCH(req: Request) {
         const relativePath = `/uploads/${path.basename(uploadedFile.filepath)}`;
         imageUrl = relativePath;
       } else {
+        // If no new image, keep existing imageUrl
         const existingPost = await prisma.post.findUnique({
           where: { id: Number(id) },
           select: { imageUrl: true },
@@ -63,7 +74,6 @@ export async function PATCH(req: Request) {
             imageUrl,
           },
         });
-
         resolve(NextResponse.json(updatedPost));
       } catch (error) {
         resolve(NextResponse.json({ error: 'Failed to update post' }, { status: 500 }));
