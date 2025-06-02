@@ -5,12 +5,13 @@ import { prisma } from '@/lib/prisma'
 
 export async function POST(req: Request) {
     const session = await getServerSession(authOptions)
+    console.log('🧾 Authenticated as:', session?.user?.email);
     if (!session || session.user.role !== 'ADMIN') {
         return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const { title, content, slug, categoryId } = await req.json()
-
+    const { title, content, categoryId } = await req.json()
+    const slug = `${title}-${Date.now()}`;
     const post = await prisma.post.create({
         data: {
             title,
