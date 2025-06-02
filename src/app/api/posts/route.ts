@@ -81,7 +81,6 @@ export async function PATCH(req: Request) {
         await writeFile(filePath, buffer)
         imageUrl = `/uploads/${filename}`
     } else {
-        // fetch existing imageUrl if no new file provided
         const existing = await prisma.post.findUnique({
             where: { id: Number(id) },
             select: { imageUrl: true },

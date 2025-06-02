@@ -153,7 +153,6 @@ export default function AdminPostDetailPage() {
     return (
         <div className="max-w-3xl mx-auto mt-6 px-14 py-8 bg-white rounded-xl shadow-xl border border-gray-100 relative">
             <div className="mb-6">
-              <label className="block text-base font-semibold mb-2 text-gray-700" htmlFor="title">제목</label>
               {editMode ? (
                   <input
                       id="title"
@@ -164,7 +163,7 @@ export default function AdminPostDetailPage() {
                       className="w-full border border-gray-300 px-4 py-3 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900"
                   />
               ) : (
-                  <p className="text-gray-800 px-4  font-bold">{title}</p>
+                  <p className="text-gray-800 text-[20px] font-bold">{title}</p>
               )}
               {titleError && <p className="text-sm text-blue-700 mt-1">{titleError}</p>}
             </div>
