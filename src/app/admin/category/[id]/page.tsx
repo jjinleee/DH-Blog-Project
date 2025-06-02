@@ -24,7 +24,6 @@ export default function CategoryPage() {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        console.log("categoryId:", categoryId);
         if (!categoryId) return;
         fetch(`/api/categories/${categoryId}/posts`)
             .then(res => res.json())

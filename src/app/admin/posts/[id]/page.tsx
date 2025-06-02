@@ -122,7 +122,7 @@ export default function AdminPostDetailPage() {
     if (!post) return <p className="text-red-600 p-6">게시글을 찾을 수 없습니다.</p>;
 
     return (
-        <div className="max-w-3xl mx-auto mt-10 px-8 py-8 bg-white rounded-xl shadow-xl border border-gray-100">
+        <div className="max-w-3xl mx-auto mt-6 px-14 py-8 bg-white rounded-xl shadow-xl border border-gray-100">
             <div className="mb-6">
               <label className="block text-base font-semibold mb-2 text-gray-700" htmlFor="title">제목</label>
               {editMode ? (

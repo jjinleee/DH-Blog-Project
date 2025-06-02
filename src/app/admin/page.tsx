@@ -51,7 +51,7 @@ export default function AdminPage() {
                 </button>
             </div>
             <div>
-                <h2 className="text-2xl font-semibold mb-4">전체 게시글</h2>
+                <h2 className="text-2xl font-semibold mb-4">All Posts</h2>
                 <ul className="space-y-3 max-w-xl">
                     {posts.map((post: any) => (
                         <li
