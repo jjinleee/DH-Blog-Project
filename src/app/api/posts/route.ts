@@ -18,10 +18,10 @@ export async function POST(req: Request) {
     const categoryId = formData.get('categoryId') as string
     const slug = `${title}-${Date.now()}`
 
-    let imageUrl: string | null = null
+    let imageUrl: string | null = '/uploads/default-postImg.png'
 
     const file = formData.get('image')
-    if (file && file instanceof File) {
+    if (file && file instanceof File && file.size > 0) {
         const bytes = await file.arrayBuffer()
         const buffer = Buffer.from(bytes)
         const ext = file.name.split('.').pop()

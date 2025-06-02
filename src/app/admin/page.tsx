@@ -40,10 +40,8 @@ export default function AdminPage() {
     return (
         <div className="p-6 max-w-4xl mx-auto">
             <h1 className="text-3xl font-bold mb-4 text-left">{session.user?.name}'s Blog</h1>
-            <p className="text-left text-gray-600 mb-6">
-                안녕하세요, {session.user?.name}님! 이 페이지는 관리자만 접근 가능합니다.
-            </p>
-            <div className="mb-4 relative">
+
+            <div className="relative w-2/3">
                 <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-4.35-4.35M17 11a6 6 0 11-12 0 6 6 0 0112 0z" />
@@ -57,20 +55,25 @@ export default function AdminPage() {
                     className="w-full pl-10 pr-4 py-2 border rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
             </div>
-            <div className="absolute top-15 right-50">
+            <div className="mb-10"></div>
+            <div className="flex justify-between items-center mb-5">
+                <h2 className="text-2xl font-semibold">All Posts</h2>
                 <button
                     onClick={() => router.push('/admin/write')}
-                    className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded shadow"
+                    className="p-1 hover:opacity-80"
+                    title="글쓰기"
                 >
-                    글쓰기
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-7 w-18 text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2v-5M18.5 2.5a2.121 2.121 0 113 3L12 15l-4 1 1-4 9.5-9.5z" />
+                    </svg>
                 </button>
             </div>
             <div>
-                <h2 className="text-2xl font-semibold mb-4">All Posts</h2>
+                {/* <h2 className="text-2xl font-semibold mb-4">All Posts</h2> */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
                     {posts
-                    .filter((post: any) =>
-                        post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                        .filter((post: any) =>
+                            post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
                             post.content.toLowerCase().includes(searchQuery.toLowerCase())
                         )
                         .map((post: any) => (
