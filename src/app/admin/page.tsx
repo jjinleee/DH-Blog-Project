@@ -57,7 +57,7 @@ export default function AdminPage() {
                     className="w-full pl-10 pr-4 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
             </div>
-            <div className="flex justify-end mb-6">
+            <div className="absolute top-15 right-50">
                 <button
                     onClick={() => router.push('/admin/write')}
                     className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded shadow"
@@ -67,24 +67,31 @@ export default function AdminPage() {
             </div>
             <div>
                 <h2 className="text-2xl font-semibold mb-4">All Posts</h2>
-                <ul className="space-y-3 max-w-xl">
-                    {posts
-                        .filter((post: any) =>
-                            post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">                    {posts
+                    .filter((post: any) =>
+                        post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
                             post.content.toLowerCase().includes(searchQuery.toLowerCase())
                         )
                         .map((post: any) => (
-                            <li
+                            <div
                                 key={post.id}
                                 onClick={() => router.push(`/admin/posts/${post.id}`)}
-                                className="border rounded-lg p-5 bg-white shadow-sm cursor-pointer hover:shadow-md transition"
+                                className="border rounded-md overflow-hidden bg-white shadow-sm cursor-pointer hover:shadow-lg transform hover:-translate-y-1 transition-all duration-200"
                             >
-                                <h3 className="text-l font-semibold">{post.title}</h3>
-                                <p className="text-xs text-gray-500">{new Date(post.createdAt).toLocaleString()}</p>
-
-                            </li>
+                                {post.imageUrl && (
+                                    <img src={post.imageUrl} alt={post.title} className="w-full h-40 object-cover"/>
+                                )}
+                                <div className="p-3">
+                                    <h3 className="text-md font-semibold mb-1 text-gray-800 truncate">{post.title}</h3>
+                                    <p className="text-sm text-gray-600 line-clamp-2">{post.content}</p>
+                                    <div className="mt-auto flex justify-between text-xs text-gray-500 pt-2">
+                                        <span>{new Date(post.createdAt).toLocaleDateString()}</span>
+                                        <span>👍 {post.likes} / 👎 {post.dislikes}</span>
+                                    </div>
+                                </div>
+                            </div>
                         ))}
-                </ul>
+                </div>
             </div>
         </div>
     );

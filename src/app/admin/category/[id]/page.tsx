@@ -12,7 +12,11 @@ interface Post {
     id: number;
     title: string;
     createdAt: string;
+    content: string;
     category: Category;
+    imageUrl?: string;
+    likes?: number;
+    dislikes?: number;
 }
 
 export default function CategoryPage() {
@@ -22,6 +26,8 @@ export default function CategoryPage() {
     const [posts, setPosts] = useState<Post[]>([]);
     const [categoryName, setCategoryName] = useState('');
     const [loading, setLoading] = useState(true);
+
+    const [searchTerm, setSearchTerm] = useState('');
 
     useEffect(() => {
         if (!categoryId) return;
@@ -49,22 +55,52 @@ export default function CategoryPage() {
 
     if (loading) return <p className="p-6">로딩 중...</p>;
 
+    const filteredPosts = posts.filter((post) =>
+        post.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        post.category.name.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
     return (
-        <div className="p-5 max-w-4xl mx-auto">
-            <h1 className="text-3xl px-10 font-bold mb-4 text-left">{categoryName}</h1>
-            <div>
-                <ul className="space-y-3 max-w-xl">
-                    {posts.map((post) => (
-                        <li
-                            key={post.id}
-                            onClick={() => router.push(`/admin/posts/${post.id}`)}
-                            className="border rounded-lg p-5 bg-white shadow-sm cursor-pointer hover:shadow-md transition"
-                        >
-                            <h3 className="text-l font-semibold">{post.title}</h3>
-                            <p className="text-xs text-gray-500">{new Date(post.createdAt).toLocaleString()}</p>
-                        </li>
-                    ))}
-                </ul>
+        <div className="p-6 max-w-4xl mx-auto">
+            <div className="flex items-center flex-wrap gap-4 mb-6"><h1
+                className="text-3xl font-bold whitespace-nowrap">{categoryName}</h1>
+                <div className="relative w-full max-w-xs sm:w-80">
+                    <input
+                        type="text"
+                        placeholder="제목 또는 내용을 검색하세요"
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        className="w-full pl-10 pr-4 py-2 border rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                    <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
+                        <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" strokeWidth="2"
+                             viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round"
+                                  d="M21 21l-4.35-4.35M17 11a6 6 0 11-12 0 6 6 0 0112 0z"/>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                {filteredPosts.map((post) => (
+                    <div
+                        key={post.id}
+                        onClick={() => router.push(`/admin/posts/${post.id}`)}
+                    className="border rounded-md overflow-hidden bg-white shadow-sm cursor-pointer hover:shadow-lg transform hover:-translate-y-1 transition-all duration-200 flex flex-col"
+                  >
+                    {post.imageUrl && (
+                      <img src={post.imageUrl} alt={post.title} className="w-full h-40 object-cover" />
+                    )}
+                    <div className="p-3 flex flex-col flex-grow">
+                      <h3 className="text-md font-semibold mb-1 text-gray-800 truncate">{post.title}</h3>
+                      <p className="text-sm text-gray-600 mb-2 line-clamp-2">{post.content}</p>
+                      <div className="mt-auto flex justify-between text-xs text-gray-500 pt-2">
+                        <span>{new Date(post.createdAt).toLocaleDateString()}</span>
+                        <span>👍 {post.likes || 0} / 👎 {post.dislikes || 0}</span>
+                      </div>
+                    </div>
+                  </div>
+                ))}
             </div>
         </div>
     );
