@@ -126,12 +126,12 @@ export default function WritePage() {
                       <label className="block text-lg font-semibold  text-gray-700 mr-2" htmlFor="category">카테고리</label>
                       <button onClick={() => setShowModal(true)} className="hover:text-gray-700">
                         <span
-                          className="inline-flex items-center justify-center w-6 h-6 rounded-full border border-black ml-1"
+                          className="inline-flex items-center justify-center w-5 h-5 rounded-full border border-black ml-1"
                         >
                           <svg
                             xmlns="http://www.w3.org/2000/svg"
-                            width="20"
-                            height="20"
+                            width="16"
+                            height="16"
                             fill="none"
                             viewBox="0 0 24 24"
                             stroke="currentColor"
@@ -145,9 +145,11 @@ export default function WritePage() {
                         id="category"
                         value={categoryId}
                         onChange={e => setCategoryId(e.target.value)}
-                        className="w-full border border-gray-300 px-4 py-3 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 pr-10 appearance-none bg-white text-gray-900"
+                        className={`w-full border border-gray-300 px-4 py-3 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 pr-10 appearance-none bg-white ${
+                          categoryId ? 'text-black' : 'text-gray-400'
+                        }`}
                     >
-                        <option value="">카테고리 선택</option>
+                        <option value="" disabled hidden>카테고리 선택</option>
                         {categories.map(cat => (
                             <option key={cat.id} value={cat.id}>{cat.name}</option>
                         ))}
