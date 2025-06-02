@@ -81,6 +81,7 @@ export default function AdminPostDetailPage() {
                 setShowModal(false);
                 const updated = await fetch('/api/categories').then(res => res.json());
                 setCategories(updated);
+                router.refresh(); // <- Force refresh
             }
         } catch (error) {
             console.error('Failed to add category:', error);
@@ -132,6 +133,7 @@ export default function AdminPostDetailPage() {
             }
 
             const updated = await res.json();
+            const categoryName = categories.find(cat => cat.id === Number(categoryId))?.name || '';
 
             // Ensure the updated image bypasses cache
             const cacheBypassUrl = updated.imageUrl ? `${updated.imageUrl}?t=${Date.now()}` : null;
@@ -139,6 +141,10 @@ export default function AdminPostDetailPage() {
             setPost({
                 ...updated,
                 imageUrl: cacheBypassUrl,
+                category: {
+                  id: Number(categoryId),
+                  name: categoryName,
+                },
             });
 
             setEditMode(false);
