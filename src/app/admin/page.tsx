@@ -13,6 +13,7 @@ export default function AdminPage() {
     const [categories, setCategories] = useState([]);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [deleteTarget, setDeleteTarget] = useState<number | null>(null);
+    const [searchQuery, setSearchQuery] = useState('');
 
     useEffect(() => {
         if (status === 'loading') return; // 아직 세션 확인 중
@@ -42,6 +43,20 @@ export default function AdminPage() {
             <p className="text-left text-gray-600 mb-6">
                 안녕하세요, {session.user?.name}님! 이 페이지는 관리자만 접근 가능합니다.
             </p>
+            <div className="mb-4 relative">
+                <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-4.35-4.35M17 11a6 6 0 11-12 0 6 6 0 0112 0z" />
+                    </svg>
+                </span>
+                <input
+                    type="text"
+                    placeholder="제목 또는 내용을 검색하세요"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="w-full pl-10 pr-4 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+            </div>
             <div className="flex justify-end mb-6">
                 <button
                     onClick={() => router.push('/admin/write')}
@@ -53,17 +68,22 @@ export default function AdminPage() {
             <div>
                 <h2 className="text-2xl font-semibold mb-4">All Posts</h2>
                 <ul className="space-y-3 max-w-xl">
-                    {posts.map((post: any) => (
-                        <li
-                            key={post.id}
-                            onClick={() => router.push(`/admin/posts/${post.id}`)}
-                            className="border rounded-lg p-5 bg-white shadow-sm cursor-pointer hover:shadow-md transition"
-                        >
-                            <h3 className="text-l font-semibold">{post.title}</h3>
-                            <p className="text-xs text-gray-500">{new Date(post.createdAt).toLocaleString()}</p>
+                    {posts
+                        .filter((post: any) =>
+                            post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                            post.content.toLowerCase().includes(searchQuery.toLowerCase())
+                        )
+                        .map((post: any) => (
+                            <li
+                                key={post.id}
+                                onClick={() => router.push(`/admin/posts/${post.id}`)}
+                                className="border rounded-lg p-5 bg-white shadow-sm cursor-pointer hover:shadow-md transition"
+                            >
+                                <h3 className="text-l font-semibold">{post.title}</h3>
+                                <p className="text-xs text-gray-500">{new Date(post.createdAt).toLocaleString()}</p>
 
-                        </li>
-                    ))}
+                            </li>
+                        ))}
                 </ul>
             </div>
         </div>
