@@ -34,6 +34,7 @@ export default function CategoryManagePage() {
       const added = await res.json();
       setCategories(prev => [...prev, added]);
       setNewCategory('');
+      router.refresh();
     }
   };
 
@@ -50,6 +51,7 @@ export default function CategoryManagePage() {
       );
       setEditId(null);
       setEditName('');
+      router.refresh();
     }
   };
 
@@ -155,6 +157,7 @@ export default function CategoryManagePage() {
                 }
                 setShowDeleteModal(false);
                 setDeleteTargetId(null);
+                router.refresh();
               }}
             >
               삭제

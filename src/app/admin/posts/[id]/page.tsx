@@ -142,6 +142,7 @@ export default function AdminPostDetailPage() {
             });
 
             setEditMode(false);
+            router.refresh();
         } catch (error) {
             console.error(error);
         }
