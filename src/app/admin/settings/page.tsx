@@ -39,20 +39,25 @@ export default function SettingsPage() {
     }, [session, status, search])
 
     return (
-        <div className="p-6">
+        <div className="max-w-3xl mx-auto p-6">
             <h1 className="text-2xl font-bold mb-4">회원 목록</h1>
             <input
                 type="text"
                 placeholder="닉네임 또는 이메일 검색"
                 value={search}
                 onChange={e => setSearch(e.target.value)}
-                className="border rounded px-3 py-2 mb-4 w-full max-w-md"
+                className="border border-gray-300 rounded px-4 py-2 mb-6 w-full max-w-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
             />
-            <ul>
-                {users.length === 0 && <li>검색 결과가 없습니다.</li>}
+            <ul className="space-y-4 ">
+                {users.length === 0 && <li className="text-gray-500">검색 결과가 없습니다.</li>}
                 {users.map(user => (
-                    <li key={user.id}>
-                        {user.name || '(이름 없음)'} ({user.email}) - {user.role}
+                    <li
+                        key={user.id}
+                    className="border border-gray-200 rounded p-4 shadow-sm hover:shadow-md transition w-full max-w-md"
+                    >
+                        <p className="text-m font-medium">
+                            {user.name || '(이름 없음)'} <span className="mx-2"> </span> <span className="text-sm text-gray-600">{user.email}</span>
+                        </p>
                     </li>
                 ))}
             </ul>
