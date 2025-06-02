@@ -21,6 +21,8 @@ export default function WritePage() {
     const [titleError, setTitleError] = useState('');
     const [contentError, setContentError] = useState('');
     const [categoryError, setCategoryError] = useState('');
+    const [newCategory, setNewCategory] = useState('');
+    const [showModal, setShowModal] = useState(false);
 
     useEffect(() => {
         if (status === 'loading') return
@@ -42,6 +44,25 @@ export default function WritePage() {
         const data = await res.json()
         setCategories(data)
     }
+
+    const handleAddCategory = async () => {
+        if (!newCategory.trim()) return;
+        try {
+            const res = await fetch('/api/categories', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name: newCategory }),
+            });
+            if (res.ok) {
+                setNewCategory('');
+                setShowModal(false);
+                fetchCategories(); // refresh list
+            }
+        } catch (error) {
+            console.error('Failed to add category:', error);
+        }
+    };
+
 
     const handleSubmit = async () => {
         let hasError = false;
@@ -101,7 +122,25 @@ export default function WritePage() {
                     {titleError && <p className="text-sm text-blue-700 mt-1">{titleError}</p>}
                 </div>
                 <div className="relative">
-                    <label className="block text-lg font-semibold mb-1 text-gray-700" htmlFor="category">카테고리</label>
+                    <div className="flex items-center mb-1">
+                      <label className="block text-lg font-semibold  text-gray-700 mr-2" htmlFor="category">카테고리</label>
+                      <button onClick={() => setShowModal(true)} className="hover:text-gray-700">
+                        <span
+                          className="inline-flex items-center justify-center w-6 h-6 rounded-full border border-black ml-1"
+                        >
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="20"
+                            height="20"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                          >
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4"/>
+                          </svg>
+                        </span>
+                      </button>
+                    </div>
                     <select
                         id="category"
                         value={categoryId}
@@ -113,9 +152,10 @@ export default function WritePage() {
                             <option key={cat.id} value={cat.id}>{cat.name}</option>
                         ))}
                     </select>
-                    <span className="pointer-events-none absolute right-3 top-[70%] transform -translate-y-1/2 text-gray-500">
+                    <span
+                        className="pointer-events-none absolute right-3 top-[70%] transform -translate-y-1/2 text-gray-500">
                         <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7"/>
                         </svg>
                     </span>
                     {categoryError && <p className="text-sm text-blue-700 mt-1">{categoryError}</p>}
@@ -142,6 +182,34 @@ export default function WritePage() {
                     </button>
                 </div>
             </div>
+            {showModal && (
+                <div className="fixed inset-0 bg-black/20 flex justify-center items-center z-50">
+                    <div className="bg-white p-6 rounded-lg shadow-md w-full max-w-sm">
+                        <h2 className="text-lg font-semibold mb-4">새 카테고리 추가</h2>
+                        <input
+                            type="text"
+                            value={newCategory}
+                            onChange={(e) => setNewCategory(e.target.value)}
+                            className="w-full border border-gray-300 px-4 py-2 rounded-md mb-4"
+                            placeholder="카테고리 이름"
+                        />
+                        <div className="flex justify-end space-x-2">
+                            <button
+                                onClick={() => setShowModal(false)}
+                                className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
+                            >
+                                취소
+                            </button>
+                            <button
+                                onClick={handleAddCategory}
+                                className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+                            >
+                                추가
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     )
 }
