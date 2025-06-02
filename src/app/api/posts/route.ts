@@ -5,7 +5,6 @@ import { prisma } from '@/lib/prisma'
 
 export async function POST(req: Request) {
     const session = await getServerSession(authOptions)
-    console.log('🧾 Authenticated as:', session?.user?.email);
     if (!session || session.user.role !== 'ADMIN') {
         return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
@@ -44,13 +43,18 @@ export async function PATCH(req: Request) {
         return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const { id, title, content } = await req.json()
+    const { id, title, content, categoryId } = await req.json()
 
     const post = await prisma.post.updateMany({
         where: {
             id: Number(id),
-            author: { email: session.user.email } },
-        data: { title, content },
+            author: { email: session.user.email }
+        },
+        data: {
+            title,
+            content,
+            categoryId: categoryId ? Number(categoryId) : null
+        },
     })
 
     return NextResponse.json(post)

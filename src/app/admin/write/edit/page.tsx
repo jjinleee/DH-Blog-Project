@@ -3,6 +3,12 @@
 import { useEffect, useState } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { useSession } from 'next-auth/react'
+import slugify from 'slugify'
+
+interface Category {
+    id: string
+    name: string
+}
 
 export default function EditPostPage() {
     const searchParams = useSearchParams()
@@ -12,25 +18,65 @@ export default function EditPostPage() {
 
     const [title, setTitle] = useState('')
     const [content, setContent] = useState('')
+    const [categoryId, setCategoryId] = useState('')
+    const [categories, setCategories] = useState<Category[]>([])
+    const [titleError, setTitleError] = useState('');
+    const [contentError, setContentError] = useState('');
+    const [categoryError, setCategoryError] = useState('');
 
     useEffect(() => {
-        if (!postId) return
+        const fetchCategories = async () => {
+            const res = await fetch('/api/categories');
+            const data = await res.json();
+            setCategories(data);
+        };
+        fetchCategories();
+    }, []);
+
+    useEffect(() => {
+        if (!postId) return;
 
         const fetchPost = async () => {
-            const res = await fetch(`/api/posts/${postId}`)
-            const data = await res.json()
-            setTitle(data.title)
-            setContent(data.content)
-        }
+            const res = await fetch(`/api/posts/${postId}`);
+            const data = await res.json();
+            setTitle(data.title);
+            setContent(data.content);
+            setCategoryId(data.categoryId?.toString() || '');
+        };
 
-        fetchPost()
+        fetchPost();
     }, [postId])
 
     const handleUpdate = async () => {
+        let hasError = false;
+
+        if (!title.trim()) {
+            setTitleError('제목을 입력해주세요.');
+            hasError = true;
+        } else {
+            setTitleError('');
+        }
+
+        if (!content.trim()) {
+            setContentError('내용을 입력해주세요.');
+            hasError = true;
+        } else {
+            setContentError('');
+        }
+
+        if (!categoryId) {
+            setCategoryError('카테고리를 선택해주세요.');
+            hasError = true;
+        } else {
+            setCategoryError('');
+        }
+
+        if (hasError) return;
+
         await fetch('/api/posts', {
             method: 'PATCH',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ id: postId, title, content }),
+            body: JSON.stringify({ id: postId, title, content, categoryId }),
         })
 
         router.push('/admin')
@@ -43,20 +89,65 @@ export default function EditPostPage() {
     }
 
     return (
-        <div>
-            <h1>글 수정</h1>
-            <input
-                type="text"
-                value={title}
-                onChange={e => setTitle(e.target.value)}
-                placeholder="제목"
-            />
-            <textarea
-                value={content}
-                onChange={e => setContent(e.target.value)}
-                placeholder="내용"
-            />
-            <button onClick={handleUpdate}>수정 완료</button>
+        <div className="max-w-3xl mx-auto mt-5 px-10 py-3 bg-white rounded-lg shadow-lg">
+            <h1 className="text-4xl font-bold mb-8 text-gray-800">Edit Post</h1>
+            <div className="space-y-6">
+                <div>
+                    <label className="block text-lg font-semibold mb-1 text-gray-700" htmlFor="title">제목</label>
+                    <input
+                        id="title"
+                        type="text"
+                        value={title}
+                        onChange={e => setTitle(e.target.value)}
+                        placeholder="제목을 입력하세요"
+                        className="w-full border border-gray-300 px-4 py-3 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900"
+                    />
+                    {titleError && <p className="text-sm text-blue-700 mt-1">{titleError}</p>}
+                </div>
+                <div className="relative">
+                    <label className="block text-lg font-semibold mb-1 text-gray-700" htmlFor="category">카테고리</label>
+                    <select
+                        id="category"
+                        value={categoryId}
+                        onChange={e => setCategoryId(e.target.value)}
+                        className={`w-full border border-gray-300 px-4 py-3 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 pr-10 appearance-none bg-white ${
+                            categoryId ? 'text-black' : 'text-gray-400'
+                        }`}
+                    >
+                        <option value="" disabled hidden>카테고리 선택</option>
+                        {categories.map(cat => (
+                            <option key={cat.id} value={cat.id}>{cat.name}</option>
+                        ))}
+                    </select>
+                    <span
+                      className="pointer-events-none absolute right-3 top-[70%] transform -translate-y-1/2 text-gray-500">
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+                      </svg>
+                    </span>
+                    {categoryError && <p className="text-sm text-blue-700 mt-1">{categoryError}</p>}
+                </div>
+                <div>
+                    <label className="block text-lg font-semibold mb-1 text-gray-700" htmlFor="content">내용</label>
+                    <textarea
+                        id="content"
+                        value={content}
+                        onChange={e => setContent(e.target.value)}
+                        placeholder="내용을 입력하세요"
+                        rows={10}
+                        className="w-full border border-gray-300 px-4 py-3 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900"
+                    />
+                    {contentError && <p className="text-sm text-blue-700 mt-1">{contentError}</p>}
+                </div>
+                <div className="text-right">
+                    <button
+                        onClick={handleUpdate}
+                        className="bg-blue-600 text-white text-base font-medium px-6 py-3 rounded-md hover:bg-blue-700 transition"
+                    >
+                        수정 완료
+                    </button>
+                </div>
+            </div>
         </div>
     )
 }
