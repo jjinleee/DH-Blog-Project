@@ -9,6 +9,7 @@ interface Post {
     title: string;
     content: string;
     createdAt: string;
+    updatedAt?: string;
     categoryId?: number;
     category?: {
         id: number;
@@ -150,7 +151,7 @@ export default function AdminPostDetailPage() {
     if (!post) return <p className="text-red-600 p-6">게시글을 찾을 수 없습니다.</p>;
 
     return (
-        <div className="max-w-3xl mx-auto mt-6 px-14 py-8 bg-white rounded-xl shadow-xl border border-gray-100">
+        <div className="max-w-3xl mx-auto mt-6 px-14 py-8 bg-white rounded-xl shadow-xl border border-gray-100 relative">
             <div className="mb-6">
               <label className="block text-base font-semibold mb-2 text-gray-700" htmlFor="title">제목</label>
               {editMode ? (
@@ -166,6 +167,29 @@ export default function AdminPostDetailPage() {
                   <p className="text-gray-800 px-4  font-bold">{title}</p>
               )}
               {titleError && <p className="text-sm text-blue-700 mt-1">{titleError}</p>}
+            </div>
+
+            <div className="absolute top-6 right-10 text-[10px] text-gray-400 text-right">
+              <p>
+                작성일: {new Date(post.createdAt).toLocaleString('ko-KR', {
+                  year: 'numeric',
+                  month: '2-digit',
+                  day: '2-digit',
+                  hour: '2-digit',
+                  minute: '2-digit',
+                })}
+              </p>
+              {post.updatedAt && (
+                <p>
+                  수정일: {new Date(post.updatedAt).toLocaleString('ko-KR', {
+                    year: 'numeric',
+                    month: '2-digit',
+                    day: '2-digit',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                  })}
+                </p>
+              )}
             </div>
 
             <div className="relative mb-6">
@@ -348,6 +372,7 @@ export default function AdminPostDetailPage() {
                     </div>
                 </div>
             )}
+
         </div>
     );
 }
