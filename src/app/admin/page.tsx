@@ -52,14 +52,15 @@ export default function AdminPage() {
             </div>
             <div>
                 <h2 className="text-2xl font-semibold mb-4">전체 게시글</h2>
-                <ul className="space-y-4">
+                <ul className="space-y-3 max-w-xl">
                     {posts.map((post: any) => (
                         <li
                             key={post.id}
-                            onClick={() => router.push(`/admin/posts/${post.id}`)}                            className="border rounded-lg p-5 bg-white shadow-sm cursor-pointer hover:shadow-md transition"
+                            onClick={() => router.push(`/admin/posts/${post.id}`)}
+                            className="border rounded-lg p-5 bg-white shadow-sm cursor-pointer hover:shadow-md transition"
                         >
-                            <h3 className="text-xl font-semibold">{post.title}</h3>
-                            <p className="text-sm text-gray-500">{new Date(post.createdAt).toLocaleString()}</p>
+                            <h3 className="text-l font-semibold">{post.title}</h3>
+                            <p className="text-xs text-gray-500">{new Date(post.createdAt).toLocaleString()}</p>
 
                         </li>
                     ))}

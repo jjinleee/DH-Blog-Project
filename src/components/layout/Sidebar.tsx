@@ -30,7 +30,7 @@ export default async function Sidebar() {
                             All Posts
                         </Link>
                         {categories.map((cat) => (
-                            <Link key={cat.id} href={`/admin/category/${cat.slug}`} className="block text-gray-700 hover:underline">
+                            <Link key={cat.id} href={`/admin/category/${cat.id}`} className="block text-gray-700 hover:underline">
                                 {cat.name}
                             </Link>
                         ))}
