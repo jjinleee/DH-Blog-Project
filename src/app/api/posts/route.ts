@@ -2,6 +2,9 @@ import { NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/authOptions'
 import { prisma } from '@/lib/prisma'
+import { writeFile } from 'fs/promises'
+import path from 'path'
+import { v4 as uuidv4 } from 'uuid'
 
 export async function POST(req: Request) {
     const session = await getServerSession(authOptions)
@@ -9,13 +12,31 @@ export async function POST(req: Request) {
         return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const { title, content, categoryId } = await req.json()
-    const slug = `${title}-${Date.now()}`;
+    const formData = await req.formData()
+    const title = formData.get('title') as string
+    const content = formData.get('content') as string
+    const categoryId = formData.get('categoryId') as string
+    const slug = `${title}-${Date.now()}`
+
+    let imageUrl: string | null = null
+
+    const file = formData.get('image')
+    if (file && file instanceof File) {
+        const bytes = await file.arrayBuffer()
+        const buffer = Buffer.from(bytes)
+        const ext = file.name.split('.').pop()
+        const filename = `${uuidv4()}.${ext}`
+        const filePath = path.join(process.cwd(), 'public', 'uploads', filename)
+        await writeFile(filePath, buffer)
+        imageUrl = `/uploads/${filename}`
+    }
+
     const post = await prisma.post.create({
         data: {
             title,
             content,
             slug,
+            imageUrl,
             author: { connect: { email: session.user.email } },
             category: categoryId ? { connect: { id: Number(categoryId) } } : undefined,
         },

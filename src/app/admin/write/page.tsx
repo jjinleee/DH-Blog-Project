@@ -17,6 +17,7 @@ export default function WritePage() {
     const [slug, setSlug] = useState('')
     const [content, setContent] = useState('')
     const [categoryId, setCategoryId] = useState('')
+    const [imageUrl, setImageUrl] = useState<File | null>(null);
     const [categories, setCategories] = useState<Category[]>([])
     const [titleError, setTitleError] = useState('');
     const [contentError, setContentError] = useState('');
@@ -92,11 +93,19 @@ export default function WritePage() {
 
         const finalSlug = slug || slugify(title, { lower: true })
 
+        const formData = new FormData();
+        formData.append('title', title);
+        formData.append('content', content);
+        formData.append('slug', finalSlug);
+        formData.append('categoryId', categoryId);
+        if (imageUrl) {
+            formData.append('image', imageUrl);
+        }
+
         await fetch('/api/posts', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ title, content, slug: finalSlug, categoryId }),
-        })
+            body: formData,
+        });
 
         router.push('/admin')
 
@@ -110,7 +119,7 @@ export default function WritePage() {
             <h1 className="text-4xl font-bold mb-8 text-gray-800">Post</h1>
             <div className="space-y-6">
                 <div>
-                    <label className="block text-lg font-semibold mb-1 text-gray-700" htmlFor="title">제목</label>
+                    <label className="block text-base font-semibold mb-2 text-gray-700" htmlFor="title">제목</label>
                     <input
                         id="title"
                         type="text"
@@ -123,7 +132,7 @@ export default function WritePage() {
                 </div>
                 <div className="relative">
                     <div className="flex items-center mb-1">
-                      <label className="block text-lg font-semibold  text-gray-700 mr-2" htmlFor="category">카테고리</label>
+                      <label className="block text-base font-semibold mb-2 text-gray-700" htmlFor="category">카테고리</label>
                       <button onClick={() => setShowModal(true)} className="hover:text-gray-700">
                         <span
                           className="inline-flex items-center justify-center w-5 h-5 rounded-full border border-black ml-1"
@@ -162,8 +171,30 @@ export default function WritePage() {
                     </span>
                     {categoryError && <p className="text-sm text-blue-700 mt-1">{categoryError}</p>}
                 </div>
+                <div className="mb-6">
+                    <label className="block text-base font-semibold mb-2 text-gray-700" htmlFor="image">이미지 업로드</label>
+                    <input
+                      id="image"
+                      type="file"
+                      accept="image/*"
+                      onChange={e => {
+                          if (e.target.files?.[0]) {
+                              setImageUrl(e.target.files[0]);
+                          }
+                      }}
+                      className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4
+                                 file:rounded-full file:border-0 file:text-sm file:font-semibold
+                                 file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                    />
+                    {imageUrl && (
+                      <div className="mt-4">
+                        <p className="text-sm text-gray-600">미리보기:</p>
+                        <img src={URL.createObjectURL(imageUrl)} alt="미리보기" className="max-w-xs mt-2 rounded shadow" />
+                      </div>
+                    )}
+                </div>
                 <div>
-                    <label className="block text-lg font-semibold mb-1 text-gray-700" htmlFor="content">내용</label>
+                    <label className="block text-base font-semibold mb-2 text-gray-700" htmlFor="content">내용</label>
                     <textarea
                         id="content"
                         value={content}

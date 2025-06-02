@@ -14,6 +14,7 @@ interface Post {
         id: number;
         name: string;
     };
+    imageUrl?: string;
 }
 
 interface Category {
@@ -41,6 +42,8 @@ export default function AdminPostDetailPage() {
     const [showModal, setShowModal] = useState(false);
     const [newCategory, setNewCategory] = useState('');
     const [showDeleteModal, setShowDeleteModal] = useState(false);
+
+    const [imageFile, setImageFile] = useState<File | null>(null);
 
     useEffect(() => {
         if (!id) return;
@@ -108,10 +111,20 @@ export default function AdminPostDetailPage() {
 
         if (hasError || !post) return;
 
+        const formData = new FormData();
+        formData.append('id', post.id.toString());
+        formData.append('title', title);
+        formData.append('content', content);
+        formData.append('categoryId', categoryId);
+        if (imageFile) {
+            formData.append('image', imageFile);
+        } else if (post.imageUrl) {
+            formData.append('imageUrl', post.imageUrl);
+        }
+
         await fetch('/api/posts', {
             method: 'PATCH',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ id: post.id, title, content, categoryId }),
+            body: formData,
         });
 
         setEditMode(false);
@@ -224,6 +237,37 @@ export default function AdminPostDetailPage() {
                 )}
                 {contentError && <p className="text-sm text-blue-700 mt-1">{contentError}</p>}
             </div>
+
+            {editMode && (
+              <div className="mb-6">
+                <label className="block text-base font-semibold mb-2 text-gray-700" htmlFor="image">이미지 업로드</label>
+                <input
+                  id="image"
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => setImageFile(e.target.files?.[0] || null)}
+                  className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4
+                             file:rounded-full file:border-0 file:text-sm file:font-semibold
+                             file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                />
+                {(imageFile || post?.imageUrl) && (
+                  <div className="mt-4">
+                    <p className="text-sm text-gray-600">미리보기:</p>
+                    <img
+                      src={imageFile ? URL.createObjectURL(imageFile) : post.imageUrl}
+                      alt="미리보기"
+                      className="max-w-xs mt-2 rounded shadow"
+                    />
+                  </div>
+                )}
+              </div>
+            )}
+
+            {!editMode && post.imageUrl && (
+              <div className="mb-6">
+                <img src={post.imageUrl} alt="첨부 이미지" className="max-w-full rounded shadow" />
+              </div>
+            )}
 
             <div className="flex justify-end space-x-2 mt-8">
                 {editMode ? (
