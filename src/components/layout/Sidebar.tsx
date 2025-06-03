@@ -15,23 +15,36 @@ export default function Sidebar({ categories }: { categories: Category[] }) {
     const [status, setStatus] = useState<'loading' | 'authenticated' | 'unauthenticated'>('loading');
 
     useEffect(() => {
-      const loadSession = async () => {
-        const s = await getSession();
-        setSession(s);
-        setStatus(s ? 'authenticated' : 'unauthenticated');
+      let interval: NodeJS.Timeout;
+
+      const fetchUser = async () => {
+        const session = await getSession();
+        setStatus(session ? 'authenticated' : 'unauthenticated');
+        if (session?.user?.email) {
+          const res = await fetch(`/api/user/me`);
+          const data = await res.json();
+          setSession({ user: data });
+        }
       };
-      loadSession();
+
+      const onUserUpdated = () => {
+        fetchUser(); // Immediately refresh on custom event
+      };
+
+      fetchUser();
+      interval = setInterval(fetchUser, 3000); // polling fallback
+      window.addEventListener('user-updated', onUserUpdated);
 
       const handleVisibilityChange = async () => {
         if (document.visibilityState === 'visible') {
-          const s = await getSession();
-          setSession(s);
-          setStatus(s ? 'authenticated' : 'unauthenticated');
+          fetchUser();
         }
       };
 
       document.addEventListener('visibilitychange', handleVisibilityChange);
       return () => {
+        clearInterval(interval);
+        window.removeEventListener('user-updated', onUserUpdated);
         document.removeEventListener('visibilitychange', handleVisibilityChange);
       };
     }, []);

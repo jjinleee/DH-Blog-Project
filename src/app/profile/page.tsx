@@ -17,11 +17,16 @@ export default function AdminProfilePage() {
 
 
   useEffect(() => {
-    if (session?.user) {
-      setName(session.user.name || '');
-      setImage(session.user.image || '');
-    }
-  }, [session]);
+    const fetchUser = async () => {
+      const res = await fetch('/api/user/me');
+      if (res.ok) {
+        const user = await res.json();
+        setName(user.name || '');
+        setImage(user.image || '');
+      }
+    };
+    fetchUser();
+  }, []);
 
   const handleBasicInfoUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -33,6 +38,7 @@ export default function AdminProfilePage() {
     if (res.ok) {
       const data = await res.json();
       await update({ name: data.name, image: data.image });
+      window.dispatchEvent(new Event('user-updated')); // notify sidebar to refresh
       router.refresh();
     } else {
       alert('기본 정보 수정 실패');
