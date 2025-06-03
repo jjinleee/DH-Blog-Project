@@ -25,7 +25,7 @@ export default function LoginPage() {
             if (session?.user?.role === 'ADMIN') {
                 router.push('/admin');
             } else {
-                router.push('/');
+                router.push('/posts');
             }
         } else {
             alert('로그인 실패');
