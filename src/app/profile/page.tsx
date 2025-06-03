@@ -33,7 +33,7 @@ export default function AdminProfilePage() {
     if (res.ok) {
       const data = await res.json();
       await update({ name: data.name, image: data.image });
-      location.reload();
+      router.refresh();
     } else {
       alert('기본 정보 수정 실패');
     }

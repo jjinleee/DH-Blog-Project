@@ -1,6 +1,7 @@
 'use client';
 
-import { useSession } from 'next-auth/react';
+import { useState, useEffect } from 'react';
+import { getSession } from 'next-auth/react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
@@ -10,7 +11,31 @@ interface Category {
 }
 
 export default function Sidebar({ categories }: { categories: Category[] }) {
-    const { data: session, status } = useSession();
+    const [session, setSession] = useState<any | null>(null);
+    const [status, setStatus] = useState<'loading' | 'authenticated' | 'unauthenticated'>('loading');
+
+    useEffect(() => {
+      const loadSession = async () => {
+        const s = await getSession();
+        setSession(s);
+        setStatus(s ? 'authenticated' : 'unauthenticated');
+      };
+      loadSession();
+
+      const handleVisibilityChange = async () => {
+        if (document.visibilityState === 'visible') {
+          const s = await getSession();
+          setSession(s);
+          setStatus(s ? 'authenticated' : 'unauthenticated');
+        }
+      };
+
+      document.addEventListener('visibilitychange', handleVisibilityChange);
+      return () => {
+        document.removeEventListener('visibilitychange', handleVisibilityChange);
+      };
+    }, []);
+
     const pathname = usePathname(); // moved above conditional
     if (status === 'loading') return null;
     const user = status === 'authenticated' ? session?.user : null;
@@ -64,7 +89,7 @@ export default function Sidebar({ categories }: { categories: Category[] }) {
 
                 {user && (
                     <div className="text-sm text-gray-600 px-5 space-y-1 mt-30">
-                        <Link href="/admin/profile" className="block hover:text-blue-500">내 정보 수정하기</Link>
+                        <Link href="/profile" className="block hover:text-blue-500">내 정보 수정하기</Link>
                          {isAdmin && (
                             <Link href="/admin/settings" className="block hover:text-blue-500">회원 검색</Link>
                         )}
