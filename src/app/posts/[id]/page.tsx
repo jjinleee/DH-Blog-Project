@@ -15,7 +15,7 @@ export default function PublicPostDetailPage() {
             .then(setPost);
     }, [id]);
 
-    if (!post) return <p className="text-red-600 p-6">게시글을 찾을 수 없습니다.</p>;
+    if (!post) return <p className="text-gray-800 p-6">로딩중</p>;
 
     return (
         <div className="max-w-3xl mx-auto mt-6 px-14 py-8 bg-white rounded-xl shadow-xl border border-gray-100 relative">
