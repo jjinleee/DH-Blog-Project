@@ -38,7 +38,7 @@ export default function Sidebar({ categories }: { categories: Category[] }) {
                             <p className="text-sm text-gray-500">{user.email}</p>
                         </div>
 
-                        <nav className="mt-13 space-y-2 p-3">
+                        <nav className="mt-5 space-y-2 p-5">
                             <Link
                                 href={isAdmin ? "/admin" : "/posts"}
                                 className="block text-[16px] font-medium text-gray-700 hover:text-blue-600 pl-2"
@@ -66,7 +66,7 @@ export default function Sidebar({ categories }: { categories: Category[] }) {
                     </>
                 )}
                 {user && (
-                    <div className="text-sm text-gray-600 px-2 space-y-1 mt-8">
+                    <div className="text-sm text-gray-600 px-5 space-y-1 mt-30">
                         <Link href="/admin/profile" className="block hover:text-blue-500">
                             내 정보 수정하기
                         </Link>
