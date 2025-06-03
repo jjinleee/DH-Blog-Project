@@ -1,13 +1,15 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 
 export default function PublicPostDetailPage() {
     const { id } = useParams();
     const [post, setPost] = useState<any>(null);
     const { data: session } = useSession();
+    const [showLoginModal, setShowLoginModal] = useState(false);
+    const router = useRouter();
 
     useEffect(() => {
         if (!id) return;
@@ -18,7 +20,7 @@ export default function PublicPostDetailPage() {
 
     const handleLike = async () => {
         if (!session) {
-            alert('로그인이 필요합니다.');
+            setShowLoginModal(true);
             return;
         }
         try {
@@ -51,7 +53,7 @@ export default function PublicPostDetailPage() {
 
     const handleDislike = async () => {
         if (!session) {
-            alert('로그인이 필요합니다.');
+            setShowLoginModal(true);
             return;
         }
         try {
@@ -134,21 +136,41 @@ export default function PublicPostDetailPage() {
             <div className="mt-4 flex items-center gap-6">
                 <button
                     onClick={handleLike}
-                    disabled={!session}
-                    className={`bg-gray-100 hover:bg-blue-100 text-gray-800 text-sm px-4 py-2 rounded ${!session ? 'opacity-50 cursor-not-allowed' : ''}`}
+                    className="bg-gray-100 hover:bg-blue-100 text-gray-800 text-sm px-4 py-2 rounded"
                     title={session ? '좋아요' : '로그인이 필요합니다'}
                 >
                     👍 ({post.likes})
                 </button>
                 <button
                     onClick={handleDislike}
-                    disabled={!session}
-                    className={`bg-gray-100 hover:bg-red-100 text-gray-800 text-sm px-4 py-2 rounded ${!session ? 'opacity-50 cursor-not-allowed' : ''}`}
+                    className="bg-gray-100 hover:bg-red-100 text-gray-800 text-sm px-4 py-2 rounded"
                     title={session ? '싫어요' : '로그인이 필요합니다'}
                 >
                     👎 ({post.dislikes})
                 </button>
             </div>
+
+            {showLoginModal && (
+                <div className="fixed inset-0 z-50 bg-black/20  flex items-center justify-center">
+                    <div className="bg-white rounded-lg shadow-md p-6 w-[320px] text-center">
+                        <p className="mb-4 text-gray-800 font-medium">로그인이 필요한 기능입니다.</p>
+                        <div className="flex justify-center gap-4">
+                            <button
+                                onClick={() => setShowLoginModal(false)}
+                                className="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300 text-sm"
+                            >
+                                취소
+                            </button>
+                            <button
+                                onClick={() => router.push('/')}
+                                className="px-4 py-2 rounded bg-blue-600 hover:bg-blue-700 text-white text-sm"
+                            >
+                                로그인하기
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }
