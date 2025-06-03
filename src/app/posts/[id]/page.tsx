@@ -139,14 +139,14 @@ export default function PublicPostDetailPage() {
                     className="bg-gray-100 hover:bg-blue-100 text-gray-800 text-sm px-4 py-2 rounded"
                     title={session ? '좋아요' : '로그인이 필요합니다'}
                 >
-                    👍 ({post.likes})
+                    👍({post.likes})
                 </button>
                 <button
                     onClick={handleDislike}
                     className="bg-gray-100 hover:bg-red-100 text-gray-800 text-sm px-4 py-2 rounded"
                     title={session ? '싫어요' : '로그인이 필요합니다'}
                 >
-                    👎 ({post.dislikes})
+                    👎({post.dislikes})
                 </button>
             </div>
 
