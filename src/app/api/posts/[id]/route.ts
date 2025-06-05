@@ -4,6 +4,8 @@ import type { NextRequest } from 'next/server';
 import fs from 'fs';
 import path from 'path';
 import { IncomingForm } from 'formidable';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/lib/authOptions';
 
 export const config = {
   api: {
@@ -18,12 +20,26 @@ export async function GET(
   const { id } = params;
 
   try {
+    const session = await getServerSession(authOptions);
+    const userEmail = session?.user?.email ?? '';
+
     const post = await prisma.post.findUnique({
       where: { id: Number(id) },
       include: { category: true },
     });
     if (!post) return NextResponse.json({ error: 'Not found' }, { status: 404 });
-    return NextResponse.json(post);
+
+    const reaction = await prisma.reaction.findFirst({
+      where: {
+        postId: Number(id),
+        userEmail,
+      },
+    });
+
+    return NextResponse.json({
+      ...post,
+      reaction: reaction?.type ?? null,
+    });
   } catch (err) {
     return NextResponse.json({ error: 'Failed to fetch post' }, { status: 500 });
   }

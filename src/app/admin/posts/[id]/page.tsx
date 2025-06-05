@@ -314,6 +314,51 @@ export default function AdminPostDetailPage() {
               </div>
             )}
 
+            {/* Like/Dislike buttons */}
+            {!editMode && (
+              <div className="flex justify-start gap-3 mb-6">
+                <button
+                  onClick={async () => {
+                    if (!session) {
+                      alert('로그인이 필요합니다.');
+                      return;
+                    }
+
+                    const res = await fetch(`/api/posts/${post?.id}/like`, {
+                      method: 'POST',
+                    });
+                    if (res.ok) {
+                      const updated = await res.json();
+                      setPost(prev => prev ? { ...prev, likes: updated.likes, dislikes: updated.dislikes } : prev);
+                    }
+                  }}
+                  className="bg-gray-100 hover:bg-blue-100 text-gray-800 text-sm px-4 py-2 rounded"
+                >
+                  👍({post?.likes})
+                </button>
+
+                <button
+                  onClick={async () => {
+                    if (!session) {
+                      alert('로그인이 필요합니다.');
+                      return;
+                    }
+
+                    const res = await fetch(`/api/posts/${post?.id}/dislike`, {
+                      method: 'POST',
+                    });
+                    if (res.ok) {
+                      const updated = await res.json();
+                      setPost(prev => prev ? { ...prev, likes: updated.likes, dislikes: updated.dislikes } : prev);
+                    }
+                  }}
+                  className="bg-gray-100 hover:bg-red-100 text-gray-800 text-sm px-4 py-2 rounded"
+                >
+                  👎({post?.dislikes})
+                </button>
+              </div>
+            )}
+
             <div className="flex justify-end space-x-2 mt-8">
                 {editMode ? (
                     <>

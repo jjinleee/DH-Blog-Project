@@ -1,7 +1,13 @@
+'use client';
+
+import { usePathname } from 'next/navigation';
 import Image from "next/image";
 import Link from "next/link";
+import { signOut } from 'next-auth/react';
 
 export default function Home() {
+  const pathname = usePathname();
+
   return (
     <div className="flex flex-col items-center justify-center min-h-screen gap-4 p-8 bg-gray-50">
       <Link href="/login">
@@ -14,11 +20,15 @@ export default function Home() {
           Sign Up
         </button>
       </Link>
-      <Link href="/guest">
-        <span className="text-sm text-gray-500 underline underline-offset-4 hover:text-gray-500 transition">
-          로그인 없이 사용하기
-        </span>
-      </Link>
+      <button
+        onClick={async () => {
+          await signOut({ redirect: false });
+          window.location.href = '/posts';
+        }}
+        className="text-sm text-gray-500 underline underline-offset-4 hover:text-gray-500 transition"
+      >
+        로그인 없이 사용하기
+      </button>
     </div>
   );
 }

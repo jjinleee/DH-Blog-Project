@@ -25,7 +25,7 @@ export default function LoginPage() {
             if (session?.user?.role === 'ADMIN') {
                 router.push('/admin');
             } else {
-                router.push('/');
+                router.push('/posts');
             }
         } else {
             alert('로그인 실패');
@@ -66,7 +66,7 @@ export default function LoginPage() {
                 </div>
 
                 <button
-                    onClick={() => signIn('github',{callbackUrl:'/'})}
+                    onClick={() => signIn('github',{callbackUrl:'/posts'})}
                     className="w-full py-2 border border-gray-300 dark:border-gray-600 rounded hover:bg-gray-100 dark:hover:bg-gray-700"
                 >
                     GitHub 로그인
